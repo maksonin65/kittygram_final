@@ -43,7 +43,7 @@ services:
     env_file:
       - .env
     ports:
-      - 8000:80
+      - 9000:80
     volumes:
       - static_volume:/staticfiles
       - media_volume:/media
