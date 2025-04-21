@@ -28,11 +28,20 @@ services:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
 
+#  frontend:
+#    image: rum6/kittygram_frontend:latest
+#    env_file:
+#      - .env
+#    command: cp -r /app/build/. /frontend_static/
+#    volumes:
+#      - static_volume:/frontend_static
+#    depends_on:
+#      - backend
   frontend:
     image: rum6/kittygram_frontend:latest
     env_file:
       - .env
-    command: cp -r /app/build/. /frontend_static/
+    command: bash -c "ls -la /app/build && ls -la /app/build/static/js && ls -la /app/build/static/css && mkdir -p /frontend_static/js && mkdir -p /frontend_static/css && mkdir -p /frontend_static/media && cp -r /app/build/static/js/* /frontend_static/js/ && cp -r /app/build/static/css/* /frontend_static/css/ && cp -r /app/build/static/media/* /frontend_static/media/ && cp -r /app/build/* /frontend_static/ && ls -la /frontend_static/js && ls -la /frontend_static/css && ls -la /frontend_static/media"
     volumes:
       - static_volume:/frontend_static
     depends_on:
