@@ -2,8 +2,6 @@ name: Kittygram Workflow
 
 on:
   push:
-    branches:
-      - main
 
 jobs:
   backend_tests:
@@ -126,6 +124,7 @@ jobs:
       - build_and_push_backend
       - build_and_push_frontend
       - build_and_push_gateway
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3

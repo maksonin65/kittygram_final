@@ -1,26 +1,136 @@
-#  Как работать с репозиторием финального задания
+# Kittygram
 
-## Что нужно сделать
+## Описание проекта
+Kittygram — это социальная сеть для обмена фотографиями котиков. Пользователи могут создавать профили своих питомцев, загружать фото, добавлять достижения и просматривать записи других пользователей. Проект включает REST API на Django, фронтенд на React и NGINX в качестве обратного прокси. Разворачивается с помощью Docker Compose и автоматизированного CI/CD через GitHub Actions.
 
-Настроить запуск проекта Kittygram в контейнерах и CI/CD с помощью GitHub Actions
+## Использованные технологии
+- **Backend**:
+  - Django 4.2.9
+  - Django REST Framework 3.14.0
+  - PostgreSQL
+  - Gunicorn 20.1.0
+  - Python-dotenv 1.0.0
+  - Pillow 10.2.0
+- **Frontend**:
+  - React
+  - Node.js 18
+- **Инфраструктура**:
+  - NGINX
+  - Docker
+  - Docker Compose
+  - GitHub Actions (CI/CD)
+- **База данных**: PostgreSQL 13
+- **Тестирование**: Flake8, Django Test Framework, npm test
 
-## Как проверить работу с помощью автотестов
+## Инструкция по запуску
 
-В корне репозитория создайте файл tests.yml со следующим содержимым:
-```yaml
-repo_owner: ваш_логин_на_гитхабе
-kittygram_domain: полная ссылка (https://доменное_имя) на ваш проект Kittygram
-taski_domain: полная ссылка (https://доменное_имя) на ваш проект Taski
-dockerhub_username: ваш_логин_на_докерхабе
+### Предварительные требования
+- Установлены: Docker, Docker Compose, Git
+- Доступ к Docker Hub (для загрузки образов)
+- Свободные порты: 80 (NGINX), 5432 (PostgreSQL), 8000 (Django)
+
+### Локальный запуск
+1. **Клонируйте репозиторий**:
+   ```bash
+   git clone https://github.com/maksonin65/kittygram_final.git
+   cd kittygram_final
+   ```
+2. **Создайте файл `.env`**:
+   Заполните `.env` необходимыми значениями, например:
+   ```
+   POSTGRES_DB=kittygram
+   POSTGRES_USER=kittygram_user
+   POSTGRES_PASSWORD=kittygram_password
+   DB_NAME=kittygram
+   DB_HOST=db
+   DB_PORT=5432
+   SECRET_KEY=your-secret-key
+   DEBUG=False
+   ALLOWED_HOSTS=localhost,127.0.0.1
+   ```
+3. **Запустите Docker Compose**:
+   ```bash
+   docker-compose up -d
+   ```
+4. **Примените миграции и соберите статические файлы**:
+   ```bash
+   docker-compose exec backend python manage.py migrate
+   docker-compose exec backend python manage.py collectstatic --noinput
+   ```
+5. **Откройте приложение**:
+   - В браузере перейдите на `http://localhost`.
+   - Создайте суперпользователя командой `docker-compose exec backend python manage.py createsuperuser`.
+   - Админ-панель доступна по `http://localhost/admin/`.
+
+### Запуск в продакшене
+1. Скопируйте `docker-compose.production.yml` и `.env` на сервер.
+2. Настройте `.env` с продакшен-значениями (например, `ALLOWED_HOSTS=your-domain.com`).
+3. Выполните:
+   ```bash
+   sudo docker compose -f docker-compose.production.yml pull
+   sudo docker compose -f docker-compose.production.yml up -d
+   sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+   sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
+   ```
+4. Настройте домен и SSL.
+
+## Примеры запросов к API
+API доступно по адресу `/api/`.
+
+### Получение списка питомцев
+```bash
+curl http://localhost/api/cats/
+```
+**Ответ** (пример):
+```json
+[
+  {
+    "id": 1,
+    "name": "Мурзик",
+    "color": "Black",
+    "birth_year": 2024,
+    "owner": "user1",
+    "achievements": ["Поймал мышь"],
+    "image": "/media/cats/murzik.jpg"
+  }
+]
 ```
 
-Скопируйте содержимое файла `.github/workflows/main.yml` в файл `kittygram_workflow.yml` в корневой директории проекта.
+### Получение токена авторизации
+```bash
+curl -X POST http://localhost/api/auth/token/login/ \
+  -d "username=user1&password=yourpassword"
+```
+**Ответ** (пример):
+```json
+{
+  "auth_token": "your-token"
+}
+```
 
-Для локального запуска тестов создайте виртуальное окружение, установите в него зависимости из backend/requirements.txt и запустите в корневой директории проекта `pytest`.
+### Создание питомца (требуется авторизация)
+```bash
+curl -X POST http://localhost/api/cats/ \
+  -H "Authorization: Token <your-token>" \
+  -F "name=Барсик" \
+  -F "color=White" \
+  -F "birth_year=2022" \
+  -F "image=@/path/to/image.jpg"
+```
+**Ответ** (пример):
+```json
+{
+  "id": 2,
+  "name": "Барсик",
+  "color": "White",
+  "birth_year": 2023,
+  "owner": "user1",
+  "achievements": [],
+  "image": "/media/cats/barsik.jpg"
+}
+```
 
-## Чек-лист для проверки перед отправкой задания
 
-- Проект Taski доступен по доменному имени, указанному в `tests.yml`.
-- Проект Kittygram доступен по доменному имени, указанному в `tests.yml`.
-- Пуш в ветку main запускает тестирование и деплой Kittygram, а после успешного деплоя вам приходит сообщение в телеграм.
-- В корне проекта есть файл `kittygram_workflow.yml`.
+## Информация об авторе
+- **Имя**: Максим
+- **Контакты**: https://github.com/maksonin65
