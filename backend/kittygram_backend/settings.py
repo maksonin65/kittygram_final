@@ -1,6 +1,7 @@
 # flake8: noqa
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -8,11 +9,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")
+SECRET_KEY = os.getenv('SECRET_KEY', 'default-secret-key')
 
-DEBUG = os.getenv("DEBUG", "false").lower() == "true"
+DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
